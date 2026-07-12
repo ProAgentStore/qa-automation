@@ -276,8 +276,12 @@ Description: ${description}`;
 			body: JSON.stringify({ messages: [{ role: "system", content: SYSTEM_PROMPT }, { role: "user", content: prompt }] }),
 		});
 		if (!res.ok) throw new Error(`Workers AI ${res.status}`);
-		const data = (await res.json()) as { result?: { response?: string }; response?: string };
-		return data.result?.response ?? data.response ?? "";
+		const data = (await res.json()) as {
+			result?: { response?: unknown; choices?: Array<{ message?: { content?: unknown } }> };
+			response?: unknown;
+		};
+		const out = data.result?.response ?? data.result?.choices?.[0]?.message?.content ?? data.response ?? "";
+		return typeof out === "string" ? out : JSON.stringify(out);
 	}
 }
 
