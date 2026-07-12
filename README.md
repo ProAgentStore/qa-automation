@@ -1,25 +1,24 @@
 # QA Automation
 
-A QA-mindset agent that writes and runs browser test flows for your ProAppStore apps. It proposes flows from your live app, saves them to the platform (never your repo), runs them headlessly after every deploy, and links you to the observable runner to watch tests click through your app live.
+A QA-mindset ProAgentStore agent for ProAppStore apps. It writes and runs
+browser test flows — **specs live in the PAS platform, never in your app
+repo** — and hands you observable-runner links so you can watch tests click
+through your live app.
 
-## AI billing
+## How it works
 
-This generated agent does not use the ProAgentStore Cloudflare Workers AI binding by default. AI calls require caller-provided Cloudflare Workers AI credentials:
+1. As the app owner, mint a **scoped QA key** (`POST /v1/apps/<app>/qa/keys`).
+   The key can only touch that app's `qa/*` routes — the agent never holds an
+   owner session token.
+2. Chat: `connect <app-id> <qa-key>`.
+3. Describe flows in plain language — the agent converts them to validated
+   platform flow specs (`@proappstore/qa-spec` format) and saves them.
+4. `run` queues headless executions in Cloudflare **Browser Rendering** on the
+   PAS platform; `status` reports results with failure diagnosis.
+5. Watch any flow live at `https://<app>.proappstore.online/__qa/?flow=<id>`.
 
-- `X-CF-Account-ID`
-- `X-CF-AI-Token`
+Deterministic commands work with no AI credentials; flow authoring and
+failure summaries use caller-provided Workers AI (`X-CF-Account-ID` /
+`X-CF-AI-Token`).
 
-That makes inference spend bill to the caller's Cloudflare account, not the ProAgentStore platform account.
-
-## Development
-
-```bash
-pnpm install
-pnpm dev
-```
-
-## Deploy
-
-```bash
-pnpm deploy
-```
+Part of proappstore-online/platform#38 + ProAgentStore/platform#14.
