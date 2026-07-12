@@ -1,0 +1,16 @@
+{
+  "id": "qa-automation",
+  "name": "QA Automation",
+  "description": "A QA-mindset agent that writes and runs browser test flows for your ProAppStore apps. It proposes flows from your live app, saves them to the platform (never your repo), runs them headlessly after every deploy, and links you to the observable runner to watch tests click through your app live.",
+  "storeType": "agent",
+  "category": "testing",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "template": "worker",
+  "serverConfig": {
+    "durableObject": true,
+    "routes": [
+      "qa-automation.proagentstore.online/*"
+    ],
+    "aiBilling": "caller-provided"
+  }
+}
