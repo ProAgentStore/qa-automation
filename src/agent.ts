@@ -266,7 +266,11 @@ Description: ${description}`;
 	private async summarizeFailures(ai: { accountId: string; token: string }, failing: RunRow[]): Promise<string> {
 		const detail = failing.map((r) => `${r.flow_id}: step ${(r.failed_step ?? 0) + 1} — ${r.error}`).join("\n");
 		const raw = await this.runAi(ai, `As a QA engineer, in 2-3 sentences: likely cause + what to check first.\nFailures:\n${detail}`);
-		return `Diagnosis: ${raw.trim().slice(0, 500)}`;
+		const text = raw.trim().slice(0, 500);
+		// The fp8 model occasionally emits token noise; suppress unreadable output.
+		const letters = (text.match(/[a-zA-Z ]/g) ?? []).length;
+		if (text.length < 20 || letters / text.length < 0.7) return "Diagnosis: the failure lines above have the exact step and target — start from the inspect link.";
+		return `Diagnosis: ${text}`;
 	}
 
 	private async runAi(ai: { accountId: string; token: string }, prompt: string): Promise<string> {
